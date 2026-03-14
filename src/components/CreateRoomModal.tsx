@@ -18,13 +18,15 @@ import {
 import { useAuthStore } from '../store/authStore';
 import { createRoom } from '../services/roomService';
 import { useNavigate } from 'react-router-dom';
+import type { TMDBMovie } from '../services/tmdbService';
 
 interface CreateRoomModalProps {
   isOpen: boolean;
   onClose: () => void;
+  initialMovie?: TMDBMovie | null;
 }
 
-export default function CreateRoomModal({ isOpen, onClose }: CreateRoomModalProps) {
+export default function CreateRoomModal({ isOpen, onClose, initialMovie }: CreateRoomModalProps) {
   const { user } = useAuthStore();
   const navigate = useNavigate();
   
@@ -33,6 +35,16 @@ export default function CreateRoomModal({ isOpen, onClose }: CreateRoomModalProp
   const [isPrivate, setIsPrivate] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
+
+  React.useEffect(() => {
+    if (initialMovie && isOpen) {
+      setName(`${initialMovie.title.toUpperCase()} İZLEME ODASI`);
+      setDescription(`${initialMovie.title} filmini beraber izliyoruz. Herkes davetlidir!`);
+    } else if (isOpen && !initialMovie) {
+      setName('');
+      setDescription('');
+    }
+  }, [initialMovie, isOpen]);
 
   if (!isOpen) return null;
 
